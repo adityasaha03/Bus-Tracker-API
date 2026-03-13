@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  name            String
+  austId          String           @unique
+  email           String           @unique
+  passwordHash    String
+  phone           String
+  role            Role
+  status          Status           @default(ACTIVE)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  coordinatorBuses CoordinatorBus[]
+}
+
+model Bus {
+  id              String           @id @default(cuid())
+  busId           String           @unique
+  busName         String
+  licensePlate    String           @unique
+  routeLabel      String
+  apiKeyHash      String
+  status          BusStatus        @default(ACTIVE)
+  lastSeenAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  readings        Reading[]
+  coordinators    CoordinatorBus[]
+}
+
+model CoordinatorBus {
+  id            String   @id @default(cuid())
+  userId        String
+  busId         String
+  user          User     @relation(fields: [userId], references: [id])
+  bus           Bus      @relation(fields: [busId], references: [id])
+  assignedAt    DateTime @default(now())
+
+  @@unique([userId, busId])
+}
+
+model Reading {
+  id         String   @id @default(cuid())
+  busId      String
+  bus        Bus      @relation(fields: [busId], references: [id])
+  longitude  Float
+  latitude   Float
+  location   Unsupported("geometry(Point, 4326)")?
+  recordedAt DateTime
+  createdAt  DateTime @default(now())
+}
+
+enum Role {
+  SUPER_ADMIN
+  COORDINATOR
+  GENERAL
+}
+
+enum Status {
+  ACTIVE
+  BLOCKED
+}
+
+enum BusStatus {
+  ACTIVE
+  BLOCKED
+}
