@@ -55,6 +55,7 @@ model Reading {
   longitude  Float
   latitude   Float
   location   Unsupported("geometry(Point, 4326)")?
+  address    String?
   recordedAt DateTime
   createdAt  DateTime @default(now())
 }
