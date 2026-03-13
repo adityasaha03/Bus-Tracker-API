@@ -9,14 +9,15 @@ export interface JwtPayload {
   exp: number;
 }
 
-export interface AuthedRequest extends Request {
-  user?: JwtPayload;
-}
-
 export interface RedisLatestPosition {
   busId: string;
   latitude: number;
   longitude: number;
   recordedAt: string;
   lastSeenAt: string;
+}
+
+export interface ValidationResult {
+  valid: boolean;
+  message?: string;
 }
