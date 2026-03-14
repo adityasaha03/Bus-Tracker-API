@@ -4,6 +4,7 @@
  */
 
 import { redis } from '../config/redis';
+import { NOMINATIM_BASE_URL, NOMINATIM_USER_AGENT } from '../config/env';
 
 export async function getAddressFromCoords(latitude: number, longitude: number): Promise<string | null> {
   // Round to 4 decimal places (~11m precision) to increase cache hits
@@ -19,11 +20,11 @@ export async function getAddressFromCoords(latitude: number, longitude: number):
     }
 
     // 2. Fetch from Nominatim if not in cache
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+    const url = `${NOMINATIM_BASE_URL}/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
     
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Bus-Tracker-API (Educational Project)'
+        'User-Agent': NOMINATIM_USER_AGENT
       }
     });
 
