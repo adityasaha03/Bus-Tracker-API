@@ -33,9 +33,36 @@ export async function createReading(req: Request): Promise<Response> {
 
     const recordTime = recordedAt ? new Date(recordedAt) : new Date();
 
-    // Fetch address from OSM (Non-blocking or catch errors so it doesn't crash the ingest)
-    const { getAddressFromCoords } = await import('../utils/geocoding');
-    const address = await getAddressFromCoords(latitude, longitude);
+    // --- GEODCODING LOGIC WITH THROTTLING & FALLBACK ---
+    let address: string | null = null;
+    const throttleKey = `geo:throttle:${bus.busId}`;
+    const isThrottled = await redis.get(throttleKey);
+
+    if (!isThrottled) {
+      try {
+        const { getAddressFromCoords } = await import('../utils/geocoding');
+        address = await getAddressFromCoords(latitude, longitude);
+        
+        if (address) {
+          // Only update throttle if we actually got a new address
+          await redis.set(throttleKey, '1', 'EX', 30);
+        }
+      } catch (err) {
+        console.error('[GEOCODING] Error during processing:', err);
+      }
+    }
+
+    // Fallback: If address is still null (throttled or failed), try to get last known address from Redis
+    if (!address) {
+      const lastKnown = await redis.get(`bus:latest:${bus.busId}`);
+      if (lastKnown) {
+        try {
+          const parsed = JSON.parse(lastKnown);
+          address = parsed.address || null;
+        } catch (e) { /* ignore parse errors */ }
+      }
+    }
+    // ----------------------------------------------------
 
     // 1. Insert to Postgres (PostGIS requires raw query or Prisma mapping; the schema has Unsupported("geometry(Point, 4326)"))
     // Wait for the result to get the `id` from returning
