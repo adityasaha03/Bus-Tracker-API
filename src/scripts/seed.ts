@@ -6,12 +6,12 @@ import { redis } from '../config/redis';
 async function seed() {
   console.log('🌱 Seeding database...');
 
-  // Clean existing data
-  console.log('Cleaning existing data...');
-  await prisma.coordinatorBus.deleteMany();
-  await prisma.reading.deleteMany();
-  await prisma.bus.deleteMany();
-  await prisma.user.deleteMany();
+  // // Clean existing data
+  // console.log('Cleaning existing data...');
+  // await prisma.coordinatorBus.deleteMany();
+  // await prisma.reading.deleteMany();
+  // await prisma.bus.deleteMany();
+  // await prisma.user.deleteMany();
 
   // Create users
   console.log('Creating users...');
