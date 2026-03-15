@@ -10,24 +10,78 @@ const UPDATE_INTERVAL = 5000; // 5 seconds
  * Replace the values in this object with your actual bus credentials.
  */
 const BUS_CREDENTIALS = [
-  { busId: 'wbx_bus_b7fa06e0cf14', apiKey: 'wbx_sk_36247bf3380a11320d1093a4481ebfdea53a4d87f0ecb5bd4ea3d00e391c4595' },
-  { busId: 'wbx_bus_7166f96665f9', apiKey: 'wbx_sk_62f2758fdeb1a0fa9824e056e49e9153711c6955f757736948268019745b58a4' },
-  { busId: 'wbx_bus_f8791f5366cd', apiKey: 'wbx_sk_ea627af304198a6bdc4a9ee3c28516eecc6374410411fcb7ade68dd3b5dac4e6' },
-  { busId: 'wbx_bus_18ac4626097d', apiKey: 'wbx_sk_0c8837ca81c8d3f0381ab6839fffa03c44822bfce3ac7217eb6a354404f524ba' },
-  { busId: 'wbx_bus_8d2206a84446', apiKey: 'wbx_sk_22c96f8137f49a36cb07626d78303c9b342031f7bc686ef86530ca7bc972759e' },
-  { busId: 'wbx_bus_d5f422ab6aa1', apiKey: 'wbx_sk_a244c043d80def7b86fefab7b924ebee12357ea70269af4c0d625d510bbbff8b' },
-  { busId: 'wbx_bus_85d0e4596b3d', apiKey: 'wbx_sk_72bb37b53a5abb84ab7c5417db9f7a18abfbaf093a6244a18deacac1f2d3c0df' },
-  { busId: 'wbx_bus_19dfb60c05a4', apiKey: 'wbx_sk_da1eeb937fd6752a7cd2276a68ee547edc6eed0e1c3b57ce0a0c1d7ff06cf528' },
-  { busId: 'wbx_bus_a67b0ef4f0ac', apiKey: 'wbx_sk_5314433a85c330daa20be09ac3464058f1ea89f003de2589b0c6312916722f38' },
-  { busId: 'wbx_bus_c565c6652822', apiKey: 'wbx_sk_1e5b5128c90b6cda31b59c00917c4218f372c908cdc1675bf2b83716f41bb0bd' },
-  { busId: 'wbx_bus_488f91ed0308', apiKey: 'wbx_sk_022a24d16238d834eac052903efd19edbc544bca78ca853e162519d45cc278fd' },
-  { busId: 'wbx_bus_d889fbe16d9f', apiKey: 'wbx_sk_a083b6391397706fd6a2a1bd1fc60198720f8961ec33c4f5aeb9462c4819a010' },
-  { busId: 'wbx_bus_254ffe51125f', apiKey: 'wbx_sk_59960218da611bb0e509e296df911c18d21b18dd809da155bb266a189174c347' },
-  { busId: 'wbx_bus_3e44f52c4f0a', apiKey: 'wbx_sk_b94418588fd1566c50edf15d5ade3f40509c983e3a67a3a7916186ac8cd736f1' },
-  { busId: 'wbx_bus_c26b22ffca67', apiKey: 'wbx_sk_4b0ab473ae44f28547f0c9fdacd6ff5bbeb70fa21dfd034e832afa54d4fa8382' },
-  { busId: 'wbx_bus_7b87e626f266', apiKey: 'wbx_sk_d4bef6902f108766587c0374473d7a65fd241c6f8e9dc2b0f7c272190eb6f503' },
-  { busId: 'wbx_bus_ab1468eeceac', apiKey: 'wbx_sk_64ad4c1aa2531b026ecc51980d967d00b9c4b8aea4f6052d745f1a870e1500fa' },
-  { busId: 'wbx_bus_a5b7e6c84f2f', apiKey: 'wbx_sk_13895e13034a496c1707817c56df788dfc23cb4843022de5baabf5df68ca5ce9' },
+  {
+    "busId": "wbx_bus_f5f4ee241d17",
+    "apiKey": "wbx_sk_8ae2ab085eb76ec4babfca4937ff144cc3509841e8493779de65abde866af82f"
+  },
+  {
+    "busId": "wbx_bus_952de936db9c",
+    "apiKey": "wbx_sk_51b11dc4b48771493657176f97d0fb5c6f736fcfba8189d213042d51d9d663b2"
+  },
+  {
+    "busId": "wbx_bus_78fa1dd3c53f",
+    "apiKey": "wbx_sk_b8bcb52e57f0243683f1c04e5723eeb6ba57961125f748086b314e6a1d7a605b"
+  },
+  {
+    "busId": "wbx_bus_d590a8979cac",
+    "apiKey": "wbx_sk_d4c705a4ba88545037ac719c6aedc2c302889c50de2604074bb815b33baeb1e2"
+  },
+  {
+    "busId": "wbx_bus_cb09ed25732b",
+    "apiKey": "wbx_sk_87f78c5e741ab380b426fa483b8e4e89835bca4f0c55cf6cf14467e95d117063"
+  },
+  {
+    "busId": "wbx_bus_c0225acb0aef",
+    "apiKey": "wbx_sk_65fc62ba3ed8af4f9d15b1bce83897169b1da0c12274afbece360a8d7c5d9d9e"
+  },
+  {
+    "busId": "wbx_bus_6ba7ae6bbd34",
+    "apiKey": "wbx_sk_5eba50e5ef49b72ccc47226b4203c11d12a4f7fb4fa1fd088daaaadfd3352c07"
+  },
+  {
+    "busId": "wbx_bus_cada6937eb01",
+    "apiKey": "wbx_sk_219f6e2c684f606fe3d8c54f928e3f4b0c07f0f7444f2a60f11013300de3f08c"
+  },
+  {
+    "busId": "wbx_bus_9120fb2ce05a",
+    "apiKey": "wbx_sk_ac6b7f3524a8cb1a2dc27438b29fefc6abde06e39a6bd65d55253176a274ec60"
+  },
+  {
+    "busId": "wbx_bus_ad6599880cb0",
+    "apiKey": "wbx_sk_4c2eae5ba797e4b048002e811a35a621d2b561aca61064fe489921d83a773e33"
+  },
+  {
+    "busId": "wbx_bus_0e2ad21b5a2b",
+    "apiKey": "wbx_sk_077a94289b520ed5eeb9433f25ef81f8f0b117ca24ac77c0fd90a37a78a6140d"
+  },
+  {
+    "busId": "wbx_bus_fd935cfd1c30",
+    "apiKey": "wbx_sk_bf0aa28abad8f32c8fd5c677ddaf153c841a31ff362f9e0d401ff9962f5666a1"
+  },
+  {
+    "busId": "wbx_bus_4ec75b5994ea",
+    "apiKey": "wbx_sk_61810148f4a75c7b108ca349ac5b320337876a129b5f1d67730f23c4322ae9a5"
+  },
+  {
+    "busId": "wbx_bus_db5bb177ad9e",
+    "apiKey": "wbx_sk_af0600498cf2b0909abb5a3d8ef934bc8631b47fa32d5ff97b7c787721a173e7"
+  },
+  {
+    "busId": "wbx_bus_310e9bbaec62",
+    "apiKey": "wbx_sk_f8c7d3745626588d9325963bc2e1563d7ee6ad1157441a27c28e69085eae7651"
+  },
+  {
+    "busId": "wbx_bus_6a3092fa4b39",
+    "apiKey": "wbx_sk_00af51a54ccb50611424133999a2d69991511cfb12540cd079ad9349ab07d422"
+  },
+  {
+    "busId": "wbx_bus_506711809de4",
+    "apiKey": "wbx_sk_ee4cb973b895922651f182d4a2512fc4f271a3a2eeb987fab61c51e754aead39"
+  },
+  {
+    "busId": "wbx_bus_1f7934a3bc83",
+    "apiKey": "wbx_sk_b385a8c166438f34b280d5eb9a8ff5eefa2c2d9ea748e0a0f879c4e646dd6040"
+  }
 ];
 
 class BusSimulator {
