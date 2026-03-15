@@ -2,8 +2,13 @@ import { health } from './handlers/health';
 import { registerUser } from './handlers/registerUser';
 import { authUser } from './handlers/authUser';
 import { assignCoordinator } from './handlers/assignCoordinator';
+import { fail } from './utils/response';
 
 export async function handleRequest(req: Request): Promise<Response> {
+  const contentLength = req.headers.get('content-length');
+  if (contentLength && parseInt(contentLength) > 1024 * 100) {
+  return fail('Request body too large', 413);
+}
   const url = new URL(req.url);
   const method = req.method;
   const path = url.pathname;
