@@ -15,11 +15,9 @@
     "pdf-parse": "^2.4.5",
     "prisma": "6"
   },
-  
   "scripts": {
     "seed": "bun src/scripts/seed.ts"
   },
-  
   "name": "bus-tracker-api",
   "private": true,
   "peerDependencies": {
