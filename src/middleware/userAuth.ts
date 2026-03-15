@@ -1,7 +1,20 @@
-import { verifyToken } from '../utils/jwt';
 import { prisma } from '../config/db';
 import { fail } from '../utils/response';
+import * as jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../config/env';
 import type { JwtPayload } from '../types/index';
+
+function verifyToken(token: string): JwtPayload {
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as any;
+    if (payload.id && !payload.userId) {
+      payload.userId = payload.id;
+    }
+    return payload as JwtPayload;
+  } catch {
+    throw fail('Invalid or expired token', 401);
+  }
+}
 
 export async function requireAuth(req: Request): Promise<JwtPayload> {
   const authHeader = req.headers.get('authorization');
@@ -12,12 +25,7 @@ export async function requireAuth(req: Request): Promise<JwtPayload> {
   if (!token)
     throw fail('Missing token', 401);
 
-  try {
-    const payload = verifyToken(token);
-    return payload;
-  } catch {
-    throw fail('Invalid or expired token', 401);
-  }
+  return verifyToken(token);
 }
 
 export async function requireSuperAdmin(req: Request): Promise<JwtPayload> {

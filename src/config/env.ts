@@ -21,3 +21,6 @@ export const INGEST_LIMIT_MAX = Number(process.env.INGEST_LIMIT_MAX) || 30;
 export const REDIS_LATEST_TTL_SECONDS = process.env.REDIS_LATEST_TTL_SECONDS
   ? Number(process.env.REDIS_LATEST_TTL_SECONDS)
   : null;
+
+export const NOMINATIM_BASE_URL = process.env.NOMINATIM_BASE_URL || 'https://nominatim.openstreetmap.org';
+export const NOMINATIM_USER_AGENT = process.env.NOMINATIM_USER_AGENT || 'Bus-Tracker-API (Educational Project)';
