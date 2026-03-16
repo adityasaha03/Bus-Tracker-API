@@ -2,7 +2,7 @@ import { prisma } from '../config/db';
 import { redis } from '../config/redis';
 import { ok, fail } from '../utils/response';
 import { getIO } from '../config/socket';
-import { comparePasswords } from '../utils/hash';
+import { verifyPassword } from '../utils/hash';
 
 export async function createReading(req: Request): Promise<Response> {
   const deviceId = req.headers.get('x-device-id');
@@ -14,11 +14,11 @@ export async function createReading(req: Request): Promise<Response> {
 
   try {
     const bus = await prisma.bus.findUnique({ where: { busId: deviceId } });
-    
+
     if (!bus) return fail('Invalid device credentials', 401);
     if (bus.status === 'BLOCKED') return fail('Device is blocked', 403);
 
-    const isKeyValid = await comparePasswords(apiKey, bus.apiKeyHash);
+    const isKeyValid = await verifyPassword(apiKey, bus.apiKeyHash);
     if (!isKeyValid) return fail('Invalid device credentials', 401);
 
     const body = await req.json();
@@ -33,7 +33,7 @@ export async function createReading(req: Request): Promise<Response> {
 
     const recordTime = recordedAt ? new Date(recordedAt) : new Date();
 
-    // --- GEODCODING LOGIC WITH THROTTLING & FALLBACK ---
+    // --- GEOCODING LOGIC WITH THROTTLING & FALLBACK ---
     let address: string | null = null;
     const throttleKey = `geo:throttle:${bus.busId}`;
     const isThrottled = await redis.get(throttleKey);
@@ -42,9 +42,8 @@ export async function createReading(req: Request): Promise<Response> {
       try {
         const { getAddressFromCoords } = await import('../utils/geocoding');
         address = await getAddressFromCoords(latitude, longitude);
-        
+
         if (address) {
-          // Only update throttle if we actually got a new address
           await redis.set(throttleKey, '1', 'EX', 30);
         }
       } catch (err) {
@@ -52,7 +51,6 @@ export async function createReading(req: Request): Promise<Response> {
       }
     }
 
-    // Fallback: If address is still null (throttled or failed), try to get last known address from Redis
     if (!address) {
       const lastKnown = await redis.get(`bus:latest:${bus.busId}`);
       if (lastKnown) {
@@ -62,11 +60,9 @@ export async function createReading(req: Request): Promise<Response> {
         } catch (e) { /* ignore parse errors */ }
       }
     }
-    // ----------------------------------------------------
+    // ---------------------------------------------------
 
-    // 1. Insert to Postgres (PostGIS requires raw query or Prisma mapping; the schema has Unsupported("geometry(Point, 4326)"))
-    // Wait for the result to get the `id` from returning
-    const [insertedReading] = await prisma.$queryRaw<any[]>`
+    await prisma.$queryRaw<any[]>`
       INSERT INTO "Reading" ("id", "busId", "longitude", "latitude", "location", "address", "recordedAt", "createdAt")
       VALUES (
         gen_random_uuid()::text,
@@ -78,44 +74,55 @@ export async function createReading(req: Request): Promise<Response> {
         ${recordTime},
         NOW()
       )
-      RETURNING "id";
     `;
 
     await prisma.bus.update({
       where: { id: bus.id },
-      data: { lastSeenAt: recordTime }
+      data: { lastSeenAt: recordTime },
     });
 
-    // 2. Write to Redis
     const latestPosParams = {
       busId: bus.busId,
       latitude,
       longitude,
       address,
       recordedAt: recordTime.toISOString(),
-      lastSeenAt: new Date().toISOString()
+      lastSeenAt: new Date().toISOString(),
     };
-    
-    // We can also have an expiry
-    await redis.set(`bus:latest:${bus.busId}`, JSON.stringify(latestPosParams));
 
-    // 3. Emit via WebSockets
-    const io = getIO();
-    io.emit('busPositionUpdate', latestPosParams);
+    // Write to Redis — failure must not crash the request
+    try {
+      await redis.set(`bus:latest:${bus.busId}`, JSON.stringify(latestPosParams));
+    } catch (err) {
+      console.error('[REDIS] Failed to write latest position:', err);
+    }
 
-    return ok({
-      busId: bus.busId,
-      latitude,
-      longitude,
-      address,
-      recordedAt: recordTime.toISOString()
-    }, 'Reading stored successfully', 201);
+    // Emit via WebSocket — to subscribed room + global map listeners
+    try {
+      const io = getIO();
+      io.to(`bus:${bus.busId}`).emit('position-update', latestPosParams);
+      io.to('map').emit('position-update', latestPosParams);
+    } catch (err) {
+      console.error('[SOCKET] Failed to emit position update:', err);
+    }
+
+    return ok(
+      {
+        busId: bus.busId,
+        latitude,
+        longitude,
+        address,
+        recordedAt: recordTime.toISOString(),
+      },
+      'Reading stored successfully',
+      201
+    );
   } catch (error: any) {
     console.error('CRITICAL ERROR in createReading:', {
       message: error.message,
       stack: error.stack,
       code: error.code,
-      meta: error.meta
+      meta: error.meta,
     });
     return fail('Internal server error', 500);
   }

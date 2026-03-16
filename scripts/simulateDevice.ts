@@ -17,7 +17,7 @@ if (!argBusId || !argApiKey) {
 const busId: string = argBusId;
 const apiKey: string = argApiKey;
 
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = 'https://bus-tracker-api-1.onrender.com';
 
 // A simple simulated route (e.g. coordinates moving slightly)
 // Starting location around AUST campus bounds
