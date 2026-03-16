@@ -36,7 +36,10 @@ export async function createReading(req: Request): Promise<Response> {
     // --- GEOCODING LOGIC WITH THROTTLING & FALLBACK ---
     let address: string | null = null;
     const throttleKey = `geo:throttle:${bus.busId}`;
+
+    console.log('[REDIS] Checking geocode throttle for bus:', bus.busId);
     const isThrottled = await redis.get(throttleKey);
+    console.log('[REDIS] Throttle status:', isThrottled ? 'throttled' : 'not throttled');
 
     if (!isThrottled) {
       try {
@@ -45,6 +48,7 @@ export async function createReading(req: Request): Promise<Response> {
 
         if (address) {
           await redis.set(throttleKey, '1', 'EX', 30);
+          console.log('[REDIS] Geocode throttle key set for bus:', bus.busId);
         }
       } catch (err) {
         console.error('[GEOCODING] Error during processing:', err);
@@ -52,12 +56,16 @@ export async function createReading(req: Request): Promise<Response> {
     }
 
     if (!address) {
+      console.log('[REDIS] Fetching last known address for bus:', bus.busId);
       const lastKnown = await redis.get(`bus:latest:${bus.busId}`);
       if (lastKnown) {
         try {
           const parsed = JSON.parse(lastKnown);
           address = parsed.address || null;
+          console.log('[REDIS] Last known address found:', address ? 'yes' : 'no');
         } catch (e) { /* ignore parse errors */ }
+      } else {
+        console.log('[REDIS] No last known position found in cache');
       }
     }
     // ---------------------------------------------------
@@ -92,7 +100,9 @@ export async function createReading(req: Request): Promise<Response> {
 
     // Write to Redis — failure must not crash the request
     try {
-      await redis.set(`bus:latest:${bus.busId}`, JSON.stringify(latestPosParams));
+      console.log('[REDIS] Attempting write for bus:', bus.busId);
+      const result = await redis.set(`bus:latest:${bus.busId}`, JSON.stringify(latestPosParams));
+      console.log('[REDIS] Write result:', result);
     } catch (err) {
       console.error('[REDIS] Failed to write latest position:', err);
     }
